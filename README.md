@@ -1,5 +1,7 @@
 # 狸奴安居 · 适猫化装修安全鉴定器 🐾
 
+![version](https://img.shields.io/badge/version-v0.1.0-FF9E7D) ![platform](https://img.shields.io/badge/小红书小工具-规范合规-7BA87B) [![License: MIT](https://img.shields.io/badge/License-MIT-E05A5A.svg)](LICENSE)
+
 > 「溪柴火软蛮毡暖，我与狸奴不出门」—— 陆游
 
 面向「养猫 + 准备装修」人群的小红书小工具：60 秒鉴定你家装修方案对猫的友好程度，输出安心指数 + 核心建议 + 避坑指南，一键生成专属海报。
@@ -32,6 +34,10 @@
 - ✅ 保存图片走 `window.xhs.miniTool.writeTempFile` → `saveImageToPhotosAlbum`；发布走 `postNote`；未注入 SDK 的环境自动降级为页内长按保存，不做 `a[download]`
 - ✅ 资源全部为相对路径 / `data:` URI，无 `<base>`、iframe、自建 CSP
 
+## 版本历史
+
+- **v0.1.0（2026-09-18）· MVP 首发版** — 三页流程、安心指数打分 + 四档小猫状态、3 条核心建议 + 6 篇避坑指南、Canvas 2D 海报（存相册/发笔记）；通过小工具规范静态合规扫描。📝 [Release Notes](https://github.com/Elisabeth15501/linu-anju/releases/tag/v0.1.0) · 📎 [下载 zip](https://github.com/Elisabeth15501/linu-anju/releases/download/v0.1.0/linu-anju-minitool.zip)
+
 ## 目录
 
 ```
@@ -40,16 +46,6 @@
 ├── LICENSE
 └── README.md
 ```
-
-## 打包上传
-
-```bash
-# 压缩「目录内容」而非目录本身，index.html 必须在 zip 根
-cd linuan-anju
-zip -r ../linuan-anju.zip index.html app.js
-```
-
-在小红书小工具上传页上传该 zip 即可。注：Chrome 61 真机兼容性为静态核对结果，未做实机验证。
 
 ## License
 
