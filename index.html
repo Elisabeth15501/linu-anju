@@ -29,6 +29,9 @@
 
   .app { max-width: 480px; margin: 0 auto; padding: 39px 24px 40px;
     padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+  /* 小工具容器内：顶部额外让出原生标题栏（返回/分享/更多）高度，
+     避免页面导航键与容器按钮重叠导致误触退出（body.xhs-app 由 app.js 注入） */
+  .xhs-app .app { padding-top: calc(92px + env(safe-area-inset-top, 0px)); }
 
   /* ===== 页面切换 ===== */
   .page { display: none; }

@@ -407,4 +407,10 @@
   if (getMiniTool() && typeof getMiniTool().postNote === 'function') {
     $('btnPostNote').style.display = '';
   }
+
+  /* 容器环境：给 body 打标记，CSS 据此让出顶部原生标题栏高度，
+     避免页面返回键与容器返回/分享按钮重叠（浏览器预览不加，版面不变） */
+  if (getMiniTool()) {
+    document.body.className += ' xhs-app';
+  }
 })();
