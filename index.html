@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>狸奴安居 · 适猫化装修安全鉴定</title>
+<style>
+  /* ===== 基线重置（Chrome 61 兼容） ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: #2B2B2B;
+    background-color: #F5F0E8;
+    /* 宣纸质感（data 内联，无外部资源） */
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0,0,0,0.015) 0 2px, transparent 2px),
+      radial-gradient(circle at 70% 60%, rgba(0,0,0,0.012) 0 2px, transparent 2px),
+      radial-gradient(circle at 40% 80%, rgba(0,0,0,0.015) 0 2px, transparent 2px);
+    background-size: 90px 90px, 130px 130px, 70px 70px;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    min-height: 100vh;
+  }
+  .kai { font-family: "Kaiti SC", "STKaiti", KaiTi, "SimKai", serif; }
+
+  .app { max-width: 480px; margin: 0 auto; padding: 24px 24px 40px;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+
+  /* ===== 页面切换 ===== */
+  .page { display: none; }
+  .page.active { display: block; animation: pageIn .45s ease both; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* ===== 小猫动画 ===== */
+  .breathe { animation: breathe 3.2s ease-in-out infinite; transform-origin: center bottom; }
+  .breathe-slow { animation: breathe 5s ease-in-out infinite; transform-origin: center bottom; }
+  @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03) translateY(-3px); } }
+  .tail { transform-origin: 10% 80%; animation: wag 2.6s ease-in-out infinite; }
+  @keyframes wag { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(10deg); } }
+
+  /* ===== 通用组件 ===== */
+  .card { background: #FFFDF9; border: 1px solid rgba(43,43,43,.08); border-radius: 20px;
+    box-shadow: 0 4px 18px rgba(43,43,43,.06); padding: 20px; margin-bottom: 16px; }
+  .card-title { font-size: 15px; font-weight: bold; }
+  .card-sub { font-size: 12px; color: rgba(43,43,43,.4); margin-top: 2px; }
+
+  .btn { display: block; width: 100%; border: none; border-radius: 999px; padding: 16px;
+    font-size: 17px; font-weight: bold; font-family: inherit; cursor: pointer;
+    transition: transform .12s ease; text-align: center; }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: #FF9E7D; color: #fff; box-shadow: 0 8px 20px rgba(255,158,125,.4); }
+  .btn-dark { background: #2B2B2B; color: #F5F0E8; }
+  .btn-ghost { background: #FFF1EA; color: #E0704E; border: 1.5px solid #FF9E7D; }
+  .btn + .btn { margin-top: 12px; }
+
+  .nav { display: flex; align-items: center; margin-bottom: 20px; }
+  .nav-title { font-size: 20px; font-weight: bold; }
+  .back { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.7);
+    border: 1px solid rgba(43,43,43,.1); font-size: 18px; color: #2B2B2B; margin-right: 12px;
+    cursor: pointer; flex-shrink: 0; }
+
+  /* ===== 首页 ===== */
+  .hero-cat { width: 240px; height: 190px; margin: 16px auto 0; display: block; }
+  .poem { text-align: center; font-size: 22px; line-height: 1.7; margin-top: 24px; }
+  .poem-from { text-align: center; font-size: 13px; color: rgba(43,43,43,.5); margin-top: 8px; }
+  .app-name { text-align: center; font-size: 26px; font-weight: bold; letter-spacing: 4px; margin-top: 32px; }
+  .app-sub { text-align: center; font-size: 14px; color: rgba(43,43,43,.55); margin-top: 8px; }
+  .cta-wrap { margin-top: 40px; }
+  .cta-note { text-align: center; font-size: 12px; color: rgba(43,43,43,.35); margin-top: 16px; }
+
+  /* ===== 输入页 ===== */
+  .field-label { display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: bold; }
+  .field-value { color: #FF9E7D; font-weight: bold; font-size: 16px; }
+
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px;
+    border-radius: 999px; outline: none; margin-top: 16px; display: block;
+    background: linear-gradient(to right, #FF9E7D var(--fill, 44%), #E8DFD0 var(--fill, 44%)); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 46px; height: 46px; border-radius: 50%;
+    border: none; cursor: pointer; background-color: transparent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ctext x='20' y='28' font-size='28' text-anchor='middle'%3E%F0%9F%90%9F%3C/text%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: center; background-size: contain; }
+
+  .select-wrap { position: relative; margin-top: 14px; }
+  .select-wrap select { width: 100%; padding: 14px 40px 14px 16px; border-radius: 16px;
+    border: 1px solid rgba(43,43,43,.1); background: #fff; font-size: 15px; font-family: inherit;
+    color: #2B2B2B; -webkit-appearance: none; appearance: none; }
+  .select-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    color: rgba(43,43,43,.4); pointer-events: none; font-size: 13px; }
+
+  /* 习性 Tag：flex-wrap + margin（基线，不用 flex gap） */
+  .tags { display: flex; flex-wrap: wrap; margin-top: 12px; }
+  .tag { border: 1.5px solid rgba(43,43,43,.13); background: rgba(255,255,255,.55);
+    border-radius: 999px; padding: 10px 16px; font-size: 15px; font-family: inherit;
+    color: #2B2B2B; cursor: pointer; transition: all .18s ease; margin: 0 10px 10px 0; }
+  .tag.on { background: #FF9E7D; border-color: #FF9E7D; color: #fff;
+    box-shadow: 0 3px 10px rgba(255,158,125,.35); }
+
+  /* 痛点卡片：Grid + grid-gap（Chrome 61 支持） */
+  .pain-grid { display: grid; grid-template-columns: 1fr 1fr; grid-gap: 12px; margin-top: 12px; }
+  .pain { border: 2px solid transparent; background: rgba(255,255,255,.55); border-radius: 18px;
+    padding: 12px; text-align: left; font-family: inherit; cursor: pointer; transition: all .18s ease; }
+  .pain.on { border-color: #FF9E7D; background: #FFF1EA; box-shadow: 0 4px 14px rgba(255,158,125,.2); }
+  .pain-emoji { font-size: 24px; display: block; }
+  .pain-text { font-size: 13px; font-weight: bold; margin-top: 4px; }
+
+  .form-tip { text-align: center; font-size: 12px; color: #E05A5A; margin-top: 12px; min-height: 16px; }
+
+  /* ===== 结果页 ===== */
+  .score-card { display: flex; align-items: center; }
+  .ring-box { position: relative; width: 110px; height: 110px; flex-shrink: 0; margin-right: 20px; }
+  .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-bg { stroke: #E8DFD0; }
+  .ring-fg { stroke: #FF9E7D; transition: stroke-dashoffset 1.2s cubic-bezier(.22,.9,.35,1); }
+  .ring-center { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-num { font-size: 30px; font-weight: bold; line-height: 1; }
+  .score-label { font-size: 11px; color: rgba(43,43,43,.45); margin-top: 2px; }
+  .mood-box { width: 92px; height: 70px; }
+  .mood-text { font-size: 13px; font-weight: bold; margin-top: 4px; }
+  .score-comment { font-size: 13px; line-height: 1.6; color: rgba(43,43,43,.65); margin: 12px 0 4px; }
+
+  .section-title { font-size: 17px; font-weight: bold; margin: 28px 0 12px; }
+  .advice { display: flex; align-items: flex-start; }
+  .advice + .advice { margin-top: 12px; }
+  .advice-icon { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; margin-right: 12px;
+    display: flex; align-items: center; justify-content: center; }
+  .advice-icon svg { width: 32px; height: 32px; display: block; }
+  .advice-body { min-width: 0; }
+  .advice-for { font-size: 13px; font-weight: bold; }
+  .advice-text { font-size: 13px; line-height: 1.6; margin-top: 4px; }
+
+  .result-actions { margin-top: 32px; }
+  .foot-note { text-align: center; font-size: 11px; color: rgba(43,43,43,.3); margin-top: 20px; }
+
+  /* ===== 弹窗（实色遮罩为基线，毛玻璃为增强） ===== */
+  .mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(43,43,43,.55);
+    display: flex; align-items: flex-end; justify-content: center; z-index: 50;
+    opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+  .mask.open { opacity: 1; pointer-events: auto; }
+  @supports ((-webkit-backdrop-filter: blur(8px)) or (backdrop-filter: blur(8px))) {
+    .mask { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  }
+  .sheet { background: #F5F0E8; width: 100%; max-width: 480px; max-height: 78vh; overflow-y: auto;
+    -webkit-overflow-scrolling: touch; border-radius: 28px 28px 0 0; padding: 24px;
+    transform: translateY(40px); transition: transform .3s cubic-bezier(.22,1.2,.4,1); }
+  .mask.open .sheet { transform: none; }
+  @media (min-width: 640px) { .mask { align-items: center; } .sheet { border-radius: 28px; } }
+  .sheet-grip { width: 48px; height: 6px; background: rgba(43,43,43,.15); border-radius: 999px; margin: 0 auto 16px; }
+  .sheet-title { text-align: center; font-size: 19px; font-weight: bold; }
+  .guide-item { background: rgba(255,255,255,.6); border: 1px solid rgba(43,43,43,.05);
+    border-radius: 16px; padding: 16px; margin-top: 12px; }
+  .guide-item-title { font-size: 14px; font-weight: bold; }
+  .guide-item-text { font-size: 13px; line-height: 1.7; color: rgba(43,43,43,.7); margin-top: 4px; }
+  .sheet .btn { margin-top: 20px; }
+
+  .poster-img { display: block; width: 100%; max-width: 320px; margin: 16px auto 0;
+    border-radius: 16px; box-shadow: 0 8px 24px rgba(43,43,43,.18); }
+  .poster-hint { text-align: center; font-size: 12px; color: rgba(43,43,43,.5); margin-top: 12px; }
+
+  /* ===== Toast ===== */
+  .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%);
+    background: #2B2B2B; color: #fff; padding: 10px 20px; border-radius: 999px;
+    font-size: 14px; z-index: 99; white-space: nowrap; animation: toastIn .3s ease; }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ 首页：陆游的邀请 ============ -->
+  <section id="page-home" class="page active">
+    <svg class="hero-cat breathe" viewBox="0 0 240 190" aria-hidden="true">
+      <path class="tail" d="M40 150 Q 8 140 14 112" stroke="#2B2B2B" stroke-width="7" fill="none" stroke-linecap="round" opacity=".85"/>
+      <path d="M60 152 Q 75 118 130 112 Q 190 106 200 132 Q 206 152 170 156 L 78 158 Q 58 158 60 152 Z" fill="#2B2B2B" opacity=".88"/>
+      <ellipse cx="180" cy="152" rx="26" ry="14" fill="#2B2B2B"/>
+      <ellipse cx="72" cy="154" rx="18" ry="8" fill="#2B2B2B"/>
+      <g transform="translate(198,88)">
+        <circle cx="0" cy="0" r="34" fill="#2B2B2B"/>
+        <path d="M-26 -18 L-34 -44 L-8 -30 Z" fill="#2B2B2B"/>
+        <path d="M26 -18 L34 -44 L8 -30 Z" fill="#2B2B2B"/>
+        <path d="M-24 -22 L-29 -37 L-13 -28 Z" fill="#FF9E7D" opacity=".9"/>
+        <path d="M24 -22 L29 -37 L13 -28 Z" fill="#FF9E7D" opacity=".9"/>
+        <path d="M-16 -2 Q -11 -8 -6 -2" stroke="#F5F0E8" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M6 -2 Q 11 -8 16 -2" stroke="#F5F0E8" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-3 8 L3 8 L0 12 Z" fill="#FF9E7D"/>
+        <path d="M0 12 Q -5 17 -9 14 M0 12 Q 5 17 9 14" stroke="#F5F0E8" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <g stroke="#2B2B2B" stroke-width="1.6" opacity=".6" stroke-linecap="round">
+          <path d="M-20 8 L-40 4"/><path d="M-20 12 L-40 14"/>
+          <path d="M20 8 L40 4"/><path d="M20 12 L40 14"/>
+        </g>
+      </g>
+      <circle cx="30" cy="40" r="3" fill="#2B2B2B" opacity=".15"/>
+      <circle cx="210" cy="30" r="2" fill="#2B2B2B" opacity=".12"/>
+    </svg>
+
+    <p class="poem kai">「溪柴火软蛮毡暖，<br>我与狸奴不出门」</p>
+    <p class="poem-from kai">—— 陆游 ·《十一月四日风雨大作》</p>
+
+    <h1 class="app-name">狸奴安居</h1>
+    <p class="app-sub">AI 适猫化装修安全鉴定器</p>
+
+    <div class="cta-wrap">
+      <button id="btnStart" class="btn btn-primary">🐾 开始鉴定我的家</button>
+      <p class="cta-note">为装修前的铲屎官 · 60 秒出报告</p>
+    </div>
+  </section>
+
+  <!-- ============ 输入页：户型与猫咪画像 ============ -->
+  <section id="page-input" class="page">
+    <div class="nav">
+      <button id="btnBackHome" class="back" aria-label="返回">←</button>
+      <h2 class="nav-title kai">猫咪与家的画像</h2>
+    </div>
+
+    <div class="card">
+      <div class="field-label"><span>🏡 实用面积</span>
+        <span class="field-value"><span id="areaVal">40</span> ㎡</span></div>
+      <input id="areaRange" type="range" min="8" max="80" value="40" aria-label="实用面积">
+      <div class="field-label" style="margin-top:24px;"><span>🏠 楼层结构</span></div>
+      <div class="select-wrap">
+        <select id="floorType">
+          <option value="normal">🐱 普通层高（2.6-2.8m）</option>
+          <option value="loft">🐱🐱 Loft / 挑高</option>
+          <option value="duplex">🐱🐱🐱 复式（有楼梯）</option>
+        </select>
+        <span class="select-arrow">▾</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">🐾 猫咪习性</p>
+      <p class="card-sub">主子是哪一款？可多选</p>
+      <div id="habitTags" class="tags">
+        <button class="tag" data-habit="parkour">🏃 爱跑酷</button>
+        <button class="tag" data-habit="high">🧗 喜欢高处</button>
+        <button class="tag" data-habit="peeing">💧 玻璃胃/乱尿</button>
+        <button class="tag" data-habit="alone">🛋️ 独处型</button>
+        <button class="tag" data-habit="clingy">🫂 粘人精</button>
+        <button class="tag" data-habit="destroyer">🪚 破坏王</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">😿 当前最头疼的事</p>
+      <p class="card-sub">单选</p>
+      <div id="painCards" class="pain-grid">
+        <button class="pain" data-pain="window"><span class="pain-emoji">😿</span><p class="pain-text">怕封窗不安全</p></button>
+        <button class="pain" data-pain="furniture"><span class="pain-emoji">😾</span><p class="pain-text">怕家具被挠坏</p></button>
+        <button class="pain" data-pain="litter"><span class="pain-emoji">🙀</span><p class="pain-text">没地方放猫砂盆</p></button>
+        <button class="pain" data-pain="aesthetic"><span class="pain-emoji">😺</span><p class="pain-text">想要人猫共居美学</p></button>
+      </div>
+    </div>
+
+    <button id="btnSubmit" class="btn btn-primary">🐾 生成鉴定报告</button>
+    <p id="formTip" class="form-tip"></p>
+  </section>
+
+  <!-- ============ 结果页：安全鉴定报告 ============ -->
+  <section id="page-result" class="page">
+    <div class="nav">
+      <button id="btnBackInput" class="back" aria-label="返回">←</button>
+      <h2 class="nav-title kai">安全鉴定报告</h2>
+    </div>
+
+    <div class="card">
+      <div class="score-card">
+        <div class="ring-box">
+          <svg class="ring-svg" viewBox="0 0 110 110">
+            <circle class="ring-bg" cx="55" cy="55" r="48" fill="none" stroke-width="9"/>
+            <circle id="ringFg" class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke-width="9"
+              stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="301.6"/>
+          </svg>
+          <div class="ring-center">
+            <span id="scoreNum" class="score-num">0</span>
+            <span class="score-label">安心指数</span>
+          </div>
+        </div>
+        <div style="min-width:0;">
+          <div id="catMoodBox" class="mood-box breathe-slow"></div>
+          <p id="moodText" class="mood-text">——</p>
+        </div>
+      </div>
+      <p id="scoreComment" class="score-comment"></p>
+    </div>
+
+    <h3 class="section-title kai">📜 核心建议</h3>
+    <div id="adviceList"></div>
+
+    <div class="result-actions">
+      <button id="btnGuide" class="btn btn-dark">🧶 查看完整装修避坑指南</button>
+      <button id="btnSavePoster" class="btn btn-primary">🐾 保存海报到相册</button>
+      <button id="btnPostNote" class="btn btn-ghost" style="display:none;">📤 发布鉴定报告到小红书</button>
+    </div>
+    <p class="foot-note">狸奴安居 · 愿每一只狸奴都安居 🐟</p>
+  </section>
+</div>
+
+<!-- ============ 避坑指南弹窗 ============ -->
+<div id="guideMask" class="mask">
+  <div class="sheet" role="dialog" aria-label="装修避坑指南">
+    <div class="sheet-grip"></div>
+    <h3 class="sheet-title kai">🧶 适猫化装修避坑指南</h3>
+    <div id="guideContent"></div>
+    <button id="btnCloseGuide" class="btn btn-dark">知道啦</button>
+  </div>
+</div>
+
+<!-- ============ 海报预览弹窗（非 SDK 环境降级） ============ -->
+<div id="posterMask" class="mask">
+  <div class="sheet" role="dialog" aria-label="海报预览">
+    <div class="sheet-grip"></div>
+    <h3 class="sheet-title kai">🐾 你的专属海报</h3>
+    <img id="posterImg" class="poster-img" alt="鉴定报告海报">
+    <p id="posterHint" class="poster-hint">长按图片即可保存</p>
+    <button id="btnClosePoster" class="btn btn-dark">关闭</button>
+  </div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
