@@ -297,20 +297,25 @@
   }
 
   function drawPoster() {
-    var W = 720;
-    /* 先在临时上下文里排版全部建议（精简版），据此决定画布高度 */
-    var probe = document.createElement('canvas').getContext('2d');
-    probe.font = '22px "PingFang SC","Microsoft YaHei",sans-serif';
-    var blocks = [];
-    for (var i = 0; i < lastAdvice.length; i++) {
-      var a = lastAdvice[i];
-      var prefix = a.tag ? '【' + a.tag + '】' : '';
-      var lines = wrapText(probe, '🐾 ' + prefix + a.for + '：' + (a.short || a.text), 580).slice(0, 2);
-      blocks.push(lines);
+    var W = 720, H = 960; /* 固定 3:4，适配笔记发布排版 */
+    /* 建议区排版：先试 20px，放不下降档 18px，保证全部精简建议都进海报 */
+    var advTop = 488, advBottom = 912, cfg = null;
+    var fontSizes = [20, 18];
+    for (var s = 0; s < fontSizes.length; s++) {
+      var fp = fontSizes[s], lh = fp + 10, gp = 10;
+      var probe = document.createElement('canvas').getContext('2d');
+      probe.font = fp + 'px "PingFang SC","Microsoft YaHei",sans-serif';
+      var blocks = [], total = 0;
+      for (var i = 0; i < lastAdvice.length; i++) {
+        var a = lastAdvice[i];
+        var prefix = a.tag ? '【' + a.tag + '】' : '';
+        var lines = wrapText(probe, '🐾 ' + prefix + a.for + '：' + (a.short || a.text), 580).slice(0, 2);
+        blocks.push(lines);
+        total += lines.length * lh + gp;
+      }
+      cfg = { fp: fp, lh: lh, gp: gp, blocks: blocks, total: total };
+      if (advTop + total - gp <= advBottom) { break; }
     }
-    var yTop = 740, need = yTop + 8;
-    for (var b = 0; b < blocks.length; b++) { need += blocks[b].length * 32 + 14; }
-    var H = Math.max(1080, Math.min(1920, need + 96));
 
     var c = document.createElement('canvas');
     c.width = W; c.height = H;
@@ -321,40 +326,40 @@
 
     ctx.fillStyle = '#2B2B2B';
     ctx.font = 'bold 52px "Kaiti SC","STKaiti",KaiTi,serif';
-    ctx.fillText('狸奴安居', W / 2, 110);
+    ctx.fillText('狸奴安居', W / 2, 88);
     ctx.fillStyle = 'rgba(43,43,43,.55)';
     ctx.font = '24px sans-serif';
-    ctx.fillText('适猫化装修建议', W / 2, 158);
+    ctx.fillText('适猫化装修建议', W / 2, 130);
 
-    drawCat(ctx, W / 2, 420, 115);
+    drawCat(ctx, W / 2, 250, 78);
 
     ctx.fillStyle = 'rgba(43,43,43,.75)';
     ctx.font = '28px "Kaiti SC","STKaiti",KaiTi,serif';
-    ctx.fillText('「溪柴火软蛮毡暖，我与狸奴不出门」', W / 2, 640);
+    ctx.fillText('「溪柴火软蛮毡暖，我与狸奴不出门」', W / 2, 400);
     ctx.fillStyle = 'rgba(43,43,43,.45)';
     ctx.font = '20px serif';
-    ctx.fillText('—— 陆游 ·《十一月四日风雨大作》', W / 2, 680);
+    ctx.fillText('—— 陆游 ·《十一月四日风雨大作》', W / 2, 434);
 
     ctx.strokeStyle = 'rgba(43,43,43,.12)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(70, 716); ctx.lineTo(W - 70, 716); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(70, 460); ctx.lineTo(W - 70, 460); ctx.stroke();
 
     ctx.textAlign = 'left';
     ctx.fillStyle = '#2B2B2B';
-    ctx.font = '22px "PingFang SC","Microsoft YaHei",sans-serif';
-    var y = yTop;
-    for (var k = 0; k < blocks.length; k++) {
-      for (var j = 0; j < blocks[k].length; j++) {
-        ctx.fillText(blocks[k][j], 70, y);
-        y += 32;
+    ctx.font = cfg.fp + 'px "PingFang SC","Microsoft YaHei",sans-serif';
+    var y = advTop;
+    for (var k = 0; k < cfg.blocks.length; k++) {
+      for (var j = 0; j < cfg.blocks[k].length; j++) {
+        ctx.fillText(cfg.blocks[k][j], 70, y);
+        y += cfg.lh;
       }
-      y += 14;
+      y += cfg.gp;
     }
 
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(43,43,43,.35)';
     ctx.font = '18px sans-serif';
-    ctx.fillText('狸奴安居 · 小红书装修小工具', W / 2, H - 36);
+    ctx.fillText('狸奴安居 · 小红书装修小工具', W / 2, H - 30);
     return c;
   }
 
@@ -385,7 +390,7 @@
     } else {
       /* 非 SDK 环境（浏览器预览）：降级为页内预览 */
       $('posterImg').src = dataUrl;
-      $('posterHint').textContent = '当前环境无法直接写相册，长按图片即可保存';
+      $('posterHint').textContent = '长按图片即可保存';
       $('posterMask').classList.add('open');
     }
   }
