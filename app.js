@@ -8,7 +8,10 @@
   'use strict';
 
   /* ================= 状态 ================= */
-  var state = { habits: [], pain: null, living: null, kids: null, allergy: null };
+  /* 三轴画像：壹户型（area/floorType/catsNow/plan）、贰猫咪画像（habits/spot）、
+     叁现状盘点（net/pain/living/kids/allergy/plant/vert/company/budget） */
+  var state = { habits: [], pain: null, living: null, kids: null, allergy: null,
+    catsNow: '1', plan: null, net: null, spot: null, plant: null, vert: null, company: null, budget: null };
   var lastAdvice = [];
 
   function $(id) { return document.getElementById(id); }
@@ -88,6 +91,14 @@
   singleSelect('liveTags', 'living', 'data-live');
   singleSelect('kidsTags', 'kids', 'data-kids');
   singleSelect('allergyTags', 'allergy', 'data-allergy');
+  singleSelect('catTags', 'catsNow', 'data-cat');
+  singleSelect('planTags', 'plan', 'data-plan');
+  singleSelect('netTags', 'net', 'data-net');
+  singleSelect('spotTags', 'spot', 'data-spot');
+  singleSelect('plantTags', 'plant', 'data-plant');
+  singleSelect('vertTags', 'vert', 'data-vert');
+  singleSelect('companyTags', 'company', 'data-company');
+  singleSelect('budgetTags', 'budget', 'data-budget');
 
   /* 痛点：单选 */
   Array.prototype.forEach.call(document.querySelectorAll('#painCards .pain'), function (btn) {
@@ -130,24 +141,75 @@
     { for: '绿植预警', color: '#7BA87B', text: '装修后添绿植避开百合、绿萝、滴水观音等对猫有毒品种，选猫草、散尾葵、波士顿蕨更稳妥。' }
   ];
 
+  /* ===== 八项现状测评的建议条目 =====
+     封窗：和猫住/猫德学院等救助机构领养审核的最低标准（金刚网，一镜到底敲窗视频核验） */
+  var WINDOW_NET = { for: '封窗安全', tag: '必做', color: '#E05A5A', text: '金刚网纱窗是救助机构领养审核的最低标准：网孔≤5cm、四角膨胀螺丝固定；推拉窗加装限位器，开口≤10cm。普通纱窗猫一抓就破，等于没封。' };
+  /* 多猫：ISFM 的 N+1 原则（猫砂盆=猫数+1）+ 垂直分层减少领地冲突 */
+  var MULTI = { for: '多猫家庭', color: '#FF9E7D', text: '猫砂盆数量＝猫数+1，分散布置不聚堆，离食水≥2m；每只猫至少 1 个专属高处点（2-3 个更稳），垂直分层能显著减少领地摩擦。' };
+  /* 危险绿植：百合花粉即可致急性肾衰；天南星科（绿萝/龟背竹/滴水观音）草酸钙 */
+  var PLANT = { for: '危险绿植/阳台', color: '#E05A5A', text: '百合剧毒（花粉都可能致肾衰），绿萝、滴水观音等天南星科也别养；未封阳台的坠楼风险与未封窗同级，加装隔离网或改封闭式猫窗台。' };
+  /* 陪伴不足：独处 8h+ 行为问题率显著上升（间歇性厌食/破坏行为/分离焦虑） */
+  var COMPANY = { for: '陪伴不足预案', color: '#FF9E7D', text: '上班空白时间靠环境补：漏食玩具、藏食点、自动逗猫棒轮流上岗，窗边观景位是性价比最高的「猫电视」。' };
+  /* 最爱呆哪：行为学共识「顺应猫已选的路径布置，成功率远高于另起炉灶」 */
+  var SPOT_ADVICE = {
+    window: { for: '窗边黄金位', color: '#7BA87B', text: '窗边是它已选中的黄金位：做一个封窗后可躺靠的加宽窗台或吊板，宽度≥30cm、承重足够；别在窗边放它够得着的易倒摆件。' },
+    high:   { for: '制高点动线', color: '#7BA87B', text: '顺应它的制高点偏好：从现有家具顶（衣柜/书柜）延伸 2-3 块承重跳板，终点留一个有靠背的观景台。' },
+    hide:   { for: '隐蔽安全屋', color: '#FF9E7D', text: '床底是它的安全屋：别强行封堵，在动线附近给个同类替代——半封闭猫窝或书柜挖格，位置选在能看见全家动静的角落。' },
+    human:  { for: '人猫共享位', color: '#FF9E7D', text: '它选了你当制高点：书桌/沙发旁留 30cm 深的共享位，比单独买猫窝成功率高得多；一块桌面延长板就够。' }
+  };
+  /* 预算三档：入门 <1k 解决 80% 痛点；1k-5k 定制承重件；5k+ 整体木作/catio */
+  var BUDGET_ADVICE = {
+    low:  { for: '低预算路线', color: '#7BA87B', text: '千元内也能做 80 分：免打孔层板+顶天立地柱解决垂直空间，纸箱 DIY 藏食点——先把安全（封窗）做满，再谈升级。' },
+    mid:  { for: '标准预算路线', color: '#7BA87B', text: '1k-5k 是舒适区：金刚网整窗 + 2-3 块定制承重跳板 + 带排气扇的猫砂柜，安全与颜值可以兼得。' },
+    high: { for: '高预算路线', color: '#7BA87B', text: '5k+ 可以走定制：通顶猫爬架、嵌入式猫家具一体化木作，甚至封个 catio 猫阳台——动工前把猫动线画进装修图，比完工后补装省一半钱。' }
+  };
+  var VERT_NO = { for: '垂直空间', color: '#7BA87B', text: '还没给猫留爬高路线：墙面跳板间距 20-40cm 错落上行（幼猫老年猫取小值），或用顶天立地猫柱起步，承重件务必打进承重墙。' };
+  var DUPLEX = { for: '复式/Loft 动线', color: '#7BA87B', text: '复式住宅资源要每层配齐：猫砂盆、水碗每层各一份，楼梯口加防坠落挡板；护栏缝隙先量一量，猫能钻过去就能掉下去。' };
+  var SMALL = { for: '小户型垂直化', color: '#7BA87B', text: '30㎡ 以内别跟地面较劲，把面积往墙上要：通顶猫柱+窗台延长板+门上跳台，地面只留猫砂盆和食水三个必占点。' };
+
   function buildAdvice() {
     var list = [];
+    /* 红线：封窗未达标（必做项置顶） */
+    if (state.net && state.net !== 'net') { list.push(WINDOW_NET); }
+    /* 痛点最优先（用户最想解决的） */
     if (state.pain && PAIN_ADVICE[state.pain]) { list.push(PAIN_ADVICE[state.pain]); }
+    /* 多猫（现在≥2 或计划再养）→ N+1 */
+    var multi = (state.catsNow === '2' || state.catsNow === '3' || state.plan === 'yes');
+    if (multi) { list.push(MULTI); }
+    /* 危险绿植/阳台 */
+    if (state.plant === 'yes') { list.push(PLANT); }
+    /* 习性建议 */
     for (var i = 0; i < state.habits.length; i++) {
       var a = ADVICE[state.habits[i]];
       if (a) { list.push(a); }
     }
+    /* 最爱呆哪 → 顺应式布置 */
+    if (state.spot && SPOT_ADVICE[state.spot]) { list.push(SPOT_ADVICE[state.spot]); }
+    /* 陪伴不足（独居建议已覆盖则不重复） */
+    if (state.company === 'short' && state.living !== 'alone') { list.push(COMPANY); }
+    /* 垂直空间：跑酷/喜高处习性、无爬高空间、小户型三条路只出一条，避免同质化 */
+    var verticalCovered = (state.habits.indexOf('parkour') > -1 || state.habits.indexOf('high') > -1);
+    if (!verticalCovered && state.vert === 'no') { list.push(VERT_NO); verticalCovered = true; }
+    var floorType = document.getElementById('floorType').value;
+    var area = parseInt(areaRange.value, 10);
+    if (!verticalCovered && area <= 30) { list.push(SMALL); verticalCovered = true; }
+    if (floorType === 'duplex') { list.push(DUPLEX); }
+    /* 预算 → 分阶段落地路线 */
+    if (state.budget && BUDGET_ADVICE[state.budget]) { list.push(BUDGET_ADVICE[state.budget]); }
+    /* 居住情况派生 */
     if (state.kids === 'yes') { list.push(KIDS_ADVICE); }
     if (state.allergy === 'yes') { list.push(ALLERGY_ADVICE); }
     var la = state.living && LIVE_ADVICE[state.living];
     if (la) { list.push(la); }
+    /* 兜底补足 */
     var fi = 0;
     while (list.length < 3 && fi < FALLBACK.length) { list.push(FALLBACK[fi]); fi++; }
-    return list.slice(0, 5);
+    return list.slice(0, 6);
   }
 
   /* ================= 结果渲染 ================= */
   function submitForm() {
+    if (!state.net) { formTip.textContent = '封窗情况是必答题哦 🪟'; return; }
     if (state.habits.length === 0) { formTip.textContent = '至少选一个猫咪习性哦 🐾'; return; }
     if (!state.pain) { formTip.textContent = '选一个当前最头疼的事吧 😿'; return; }
     formTip.textContent = '';
@@ -157,6 +219,7 @@
     var html = '';
     for (var i = 0; i < lastAdvice.length; i++) {
       var a = lastAdvice[i];
+      var badge = a.tag ? '<span style="background:' + a.color + ';color:#fff;font-size:10px;padding:1px 8px;border-radius:999px;margin-left:6px;vertical-align:2px;">' + a.tag + '</span>' : '';
       html += '<div class="advice card" style="margin-bottom:0;">'
         + '<div class="advice-icon" style="background:' + a.color + '22;">'
         + '<svg viewBox="0 0 40 40"><g transform="translate(20,21) scale(.42)">'
@@ -168,7 +231,7 @@
         + '<g stroke="#2B2B2B" stroke-width="1.6" opacity=".55" stroke-linecap="round"><path d="M-22 6 L-38 2"/><path d="M22 6 L38 2"/></g>'
         + '</g></svg></div>'
         + '<div class="advice-body">'
-        + '<p class="advice-for" style="color:' + a.color + ';">针对「' + a.for + '」</p>'
+        + '<p class="advice-for" style="color:' + a.color + ';">针对「' + a.for + '」' + badge + '</p>'
         + '<p class="advice-text">🐾 ' + a.text + '</p>'
         + '</div></div>';
     }

@@ -51,6 +51,14 @@
   .card-title { font-size: 15px; font-weight: bold; }
   .card-sub { font-size: 12px; color: rgba(43,43,43,.4); margin-top: 2px; }
 
+  /* 三轴分组标题 */
+  .axis-head { display: flex; align-items: center; margin: 28px 0 12px; }
+  .axis-head:first-child { margin-top: 6px; }
+  .axis-num { font-family: "Kaiti SC","STKaiti",KaiTi,serif; font-weight: bold; font-size: 14px;
+    color: #E0704E; border: 1.5px solid #FF9E7D; border-radius: 999px; padding: 2px 12px; background: #FFF1EA; }
+  .axis-name { font-size: 15px; font-weight: bold; margin-left: 10px; }
+  .axis-line { flex: 1; height: 1px; background: rgba(43,43,43,.12); margin-left: 12px; }
+
   .btn { display: block; width: 100%; border: none; border-radius: 999px; padding: 16px;
     font-size: 17px; font-weight: bold; font-family: inherit; cursor: pointer;
     transition: transform .12s ease; text-align: center; }
@@ -207,6 +215,7 @@
       <h2 class="nav-title kai">猫咪与家的画像</h2>
     </div>
 
+    <div class="axis-head"><span class="axis-num kai">壹</span><span class="axis-name">户型</span><span class="axis-line"></span></div>
     <div class="card">
       <div class="field-label"><span>🏡 实用面积</span>
         <span class="field-value"><span id="areaVal">40</span> ㎡</span></div>
@@ -220,8 +229,21 @@
         </select>
         <span class="select-arrow">▾</span>
       </div>
+      <p class="field-label" style="margin-top:20px;"><span>🐱 家里现有几只猫</span></p>
+      <div id="catTags" class="tags">
+        <button class="tag" data-cat="0">还没养</button>
+        <button class="tag on" data-cat="1">1 只</button>
+        <button class="tag" data-cat="2">2 只</button>
+        <button class="tag" data-cat="3">3 只及以上</button>
+      </div>
+      <p class="field-label" style="margin-top:4px;"><span>🐾 计划再多养一只吗</span><span class="card-sub">选填</span></p>
+      <div id="planTags" class="tags">
+        <button class="tag" data-plan="no">不养了</button>
+        <button class="tag" data-plan="yes">会再养</button>
+      </div>
     </div>
 
+    <div class="axis-head"><span class="axis-num kai">贰</span><span class="axis-name">猫咪画像</span><span class="axis-line"></span></div>
     <div class="card">
       <p class="card-title">🐾 猫咪习性</p>
       <p class="card-sub">主子是哪一款？可多选</p>
@@ -232,6 +254,24 @@
         <button class="tag" data-habit="alone">🛋️ 独处型</button>
         <button class="tag" data-habit="clingy">🫂 粘人精</button>
         <button class="tag" data-habit="destroyer">🪚 破坏王</button>
+      </div>
+      <p class="field-label" style="margin-top:14px;"><span>📍 主子最爱呆在哪</span><span class="card-sub">选填</span></p>
+      <div id="spotTags" class="tags">
+        <button class="tag" data-spot="window">🌤️ 窗边晒太阳</button>
+        <button class="tag" data-spot="high">🧗 高处制高点</button>
+        <button class="tag" data-spot="hide">🕳️ 床底隐蔽处</button>
+        <button class="tag" data-spot="human">🫂 跟着人走</button>
+      </div>
+    </div>
+
+    <div class="axis-head"><span class="axis-num kai">叁</span><span class="axis-name">现状盘点</span><span class="axis-line"></span></div>
+    <div class="card">
+      <p class="card-title">🪟 封窗情况</p>
+      <p class="card-sub">必答 · 救助机构领养审核的底线标准</p>
+      <div id="netTags" class="tags">
+        <button class="tag" data-net="net">✅ 已装金刚网</button>
+        <button class="tag" data-net="normal">普通纱窗</button>
+        <button class="tag" data-net="none">还没封</button>
       </div>
     </div>
 
@@ -265,6 +305,33 @@
       <div id="allergyTags" class="tags">
         <button class="tag" data-allergy="yes">有</button>
         <button class="tag" data-allergy="no">没有</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">🧾 现状补充</p>
+      <p class="card-sub">选填 · 有则建议更准</p>
+      <p class="field-label" style="margin-top:14px;"><span>🌿 有危险绿植 / 未封阳台</span></p>
+      <div id="plantTags" class="tags">
+        <button class="tag" data-plant="yes">有</button>
+        <button class="tag" data-plant="no">没有</button>
+      </div>
+      <p class="field-label" style="margin-top:4px;"><span>🧗 已有爬高空间（跳板/爬架）</span></p>
+      <div id="vertTags" class="tags">
+        <button class="tag" data-vert="yes">有</button>
+        <button class="tag" data-vert="no">没有</button>
+      </div>
+      <p class="field-label" style="margin-top:4px;"><span>⏰ 每天能陪猫多久</span></p>
+      <div id="companyTags" class="tags">
+        <button class="tag" data-company="short">上班基本不在家</button>
+        <button class="tag" data-company="mid">早晚在家</button>
+        <button class="tag" data-company="long">长时间在家</button>
+      </div>
+      <p class="field-label" style="margin-top:4px;"><span>💰 改造预算</span></p>
+      <div id="budgetTags" class="tags">
+        <button class="tag" data-budget="low">省着来（千元内）</button>
+        <button class="tag" data-budget="mid">标准（1k-5k）</button>
+        <button class="tag" data-budget="high">不差钱（5k+）</button>
       </div>
     </div>
 
