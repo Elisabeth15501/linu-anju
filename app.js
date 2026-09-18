@@ -371,28 +371,28 @@
       ? window.xhs.miniTool : null;
   }
 
+  /* 生成海报 → 统一打开海报页；保存/发布按钮在海报页内按环境显示 */
   function exportPoster() {
     if (lastAdvice.length === 0) { toast('先生成一份建议哦 🐾'); return; }
-    var dataUrl = getPosterDataUrl();
+    $('posterImg').src = getPosterDataUrl();
+    $('posterMask').classList.add('open');
+  }
+
+  function saveToAlbum() {
     var mt = getMiniTool();
-    if (mt) {
-      var p = Promise.resolve(dataUrl);
-      if (typeof mt.writeTempFile === 'function') {
-        p = mt.writeTempFile({ data: dataUrl }).then(function (res) { return res.filePath; });
-      }
-      p.then(function (filePath) {
-        return mt.saveImageToPhotosAlbum({ filePath: filePath });
-      }).then(function () {
-        toast('海报已保存到相册 🐾');
-      }).catch(function (err) {
-        toast('保存失败：' + ((err && err.errMsg) || '未知原因'));
-      });
-    } else {
-      /* 非 SDK 环境（浏览器预览）：降级为页内预览 */
-      $('posterImg').src = dataUrl;
-      $('posterHint').textContent = '长按图片即可保存';
-      $('posterMask').classList.add('open');
+    if (!mt) { toast('长按图片即可保存'); return; }
+    var dataUrl = $('posterImg').src;
+    var p = Promise.resolve(dataUrl);
+    if (typeof mt.writeTempFile === 'function') {
+      p = mt.writeTempFile({ data: dataUrl }).then(function (res) { return res.filePath; });
     }
+    p.then(function (filePath) {
+      return mt.saveImageToPhotosAlbum({ filePath: filePath });
+    }).then(function () {
+      toast('海报已保存到相册 🐾');
+    }).catch(function (err) {
+      toast('保存失败：' + ((err && err.errMsg) || '未知原因'));
+    });
   }
 
   function publishNote() {
@@ -422,14 +422,15 @@
   $('btnGuide').addEventListener('click', openGuide);
   $('btnCloseGuide').addEventListener('click', closeGuide);
   $('btnSavePoster').addEventListener('click', exportPoster);
+  $('btnSaveAlbum').addEventListener('click', saveToAlbum);
   $('btnPostNote').addEventListener('click', publishNote);
   $('btnClosePoster').addEventListener('click', closePoster);
   $('guideMask').addEventListener('click', function (e) { if (e.target === this) closeGuide(); });
   $('posterMask').addEventListener('click', function (e) { if (e.target === this) closePoster(); });
 
-  /* 有端能力 SDK 时才显示发布按钮 */
+  /* 小工具容器内（有 SDK）：海报页内显示「保存到相册 / 发布到小红书」按钮组 */
   if (getMiniTool() && typeof getMiniTool().postNote === 'function') {
-    $('btnPostNote').style.display = '';
+    $('posterSdkActions').style.display = '';
   }
 
   /* 容器环境：给 body 打标记，CSS 据此让出顶部原生标题栏高度，
