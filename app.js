@@ -1,13 +1,14 @@
-/* 狸奴安居 · 适猫化装修安全鉴定
+/* 狸奴安居 · 适猫化装修建议
  * 小工具合规版脚本：经典脚本（无 module/import）、ES2017、无内联事件、
  * 无网络请求、无 eval / Worker / a[download]。
  * 海报用 Canvas 2D 原生绘制；保存走 window.xhs.miniTool JSBridge，
- * 未注入 SDK 的环境降级为页内预览。 */
+ * 未注入 SDK 的环境降级为页内预览。
+ * v0.2 方向：删除安心指数，北极星 = 画像（户型+居住情况+猫咪画像+痛点）→ 定制建议。 */
 (function () {
   'use strict';
 
   /* ================= 状态 ================= */
-  var state = { habits: [], pain: null, score: 0 };
+  var state = { habits: [], pain: null, living: null, kids: null, allergy: null };
   var lastAdvice = [];
 
   function $(id) { return document.getElementById(id); }
@@ -23,7 +24,6 @@
       var next = $(id);
       next.classList.add('active');
       window.scrollTo(0, 0);
-      if (id === 'page-result') animateScore();
       switching = false;
     }
     if (cur) {
@@ -64,6 +64,7 @@
   areaRange.addEventListener('input', syncSlider);
   syncSlider();
 
+  /* 习性：多选 */
   Array.prototype.forEach.call(document.querySelectorAll('#habitTags .tag'), function (btn) {
     btn.addEventListener('click', function () {
       btn.classList.toggle('on');
@@ -73,6 +74,22 @@
     });
   });
 
+  /* 单选组通用绑定（居住情况三问） */
+  function singleSelect(containerId, key, attr) {
+    var btns = document.querySelectorAll('#' + containerId + ' .tag');
+    Array.prototype.forEach.call(btns, function (btn) {
+      btn.addEventListener('click', function () {
+        Array.prototype.forEach.call(btns, function (b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        state[key] = btn.getAttribute(attr);
+      });
+    });
+  }
+  singleSelect('liveTags', 'living', 'data-live');
+  singleSelect('kidsTags', 'kids', 'data-kids');
+  singleSelect('allergyTags', 'allergy', 'data-allergy');
+
+  /* 痛点：单选 */
   Array.prototype.forEach.call(document.querySelectorAll('#painCards .pain'), function (btn) {
     btn.addEventListener('click', function () {
       Array.prototype.forEach.call(document.querySelectorAll('#painCards .pain'), function (b) {
@@ -82,65 +99,6 @@
       state.pain = btn.getAttribute('data-pain');
     });
   });
-
-  /* ================= 打分 ================= */
-  function calculateScore() {
-    var area = Number(areaRange.value);
-    var floor = $('floorType').value;
-    var s = 46;
-    s += Math.round((area - 8) / 72 * 18);
-    if (floor === 'loft') s += 10;
-    if (floor === 'duplex') s += 14;
-    var pen = { parkour: 10, high: 6, peeing: 12, alone: 0, clingy: 2, destroyer: 9 };
-    for (var i = 0; i < state.habits.length; i++) { s -= pen[state.habits[i]] || 0; }
-    var painPen = { window: 12, furniture: 8, litter: 8, aesthetic: 3 };
-    if (state.pain) { s -= painPen[state.pain] || 0; }
-    return Math.max(5, Math.min(96, s));
-  }
-
-  function moodOf(score) {
-    if (score >= 80) return { text: '惬意躺平 🍃', comment: '你家底子不错，主子已经翻出肚皮了。稍加布置，就是它眼里最好的人间。' };
-    if (score >= 60) return { text: '眯眼打盹 😌', comment: '整体安全，但有几处小刺挠。按下面的建议补齐，主子能睡得更沉。' };
-    if (score >= 40) return { text: '耳朵警惕 👀', comment: '有几处隐患正让主子如坐针毡。别急，装修前改图纸，比入住后拆墙省十倍力气。' };
-    return { text: '炸毛紧张 ⚡', comment: '警告：当前方案对猫不太友好。好在你在装修前看到了这份报告——现在改，一切都来得及。' };
-  }
-
-  function catFaceSVG(score) {
-    var scared = score < 40;
-    var alert = score >= 40 && score < 60;
-    var cozy = score >= 60;
-    var eye;
-    if (cozy) {
-      eye = '<path d="M-14 -2 Q -9 -8 -4 -2 M4 -2 Q 9 -8 14 -2" stroke="#F5F0E8" stroke-width="3" fill="none" stroke-linecap="round"/>';
-    } else if (alert) {
-      eye = '<circle cx="-9" cy="-3" r="3.4" fill="#F5F0E8"/><circle cx="9" cy="-3" r="3.4" fill="#F5F0E8"/>';
-    } else {
-      eye = '<circle cx="-9" cy="-3" r="4.4" fill="#F5F0E8"/><circle cx="-9" cy="-3" r="1.8" fill="#2B2B2B"/>'
-          + '<circle cx="9" cy="-3" r="4.4" fill="#F5F0E8"/><circle cx="9" cy="-3" r="1.8" fill="#2B2B2B"/>';
-    }
-    var fur = scared
-      ? '<g stroke="#2B2B2B" stroke-width="2.4" stroke-linecap="round">'
-        + '<path d="M-24 -24 L-32 -34"/><path d="M-16 -30 L-20 -42"/>'
-        + '<path d="M16 -30 L20 -42"/><path d="M24 -24 L32 -34"/></g>'
-      : '';
-    var mouth = scared
-      ? '<ellipse cx="0" cy="15" rx="4" ry="5" fill="none" stroke="#F5F0E8" stroke-width="2"/>'
-      : '<path d="M0 10 Q -5 15 -9 12 M0 10 Q 5 15 9 12" stroke="#F5F0E8" stroke-width="2" fill="none" stroke-linecap="round"/>';
-    return '<svg viewBox="0 0 100 80" style="width:100%;height:100%;">' + fur
-      + '<g transform="translate(50,46)">'
-      + '<circle cx="0" cy="0" r="28" fill="#2B2B2B"/>'
-      + '<path d="M-20 -16 L-27 -38 L-6 -26 Z" fill="#2B2B2B"/>'
-      + '<path d="M20 -16 L27 -38 L6 -26 Z" fill="#2B2B2B"/>'
-      + '<path d="M-18 -19 L-22 -31 L-10 -24 Z" fill="#FF9E7D"/>'
-      + '<path d="M18 -19 L22 -31 L10 -24 Z" fill="#FF9E7D"/>'
-      + eye
-      + '<path d="M-2 7 L2 7 L0 10 Z" fill="#FF9E7D"/>'
-      + mouth
-      + '<g stroke="#2B2B2B" stroke-width="1.4" opacity=".55" stroke-linecap="round">'
-      + '<path d="M-22 6 L-38 2"/><path d="M-22 10 L-38 12"/>'
-      + '<path d="M22 6 L38 2"/><path d="M22 10 L38 12"/></g>'
-      + '</g></svg>';
-  }
 
   /* ================= 建议库 ================= */
   var ADVICE = {
@@ -157,6 +115,15 @@
     litter:    { for: '猫砂盆布局', color: '#E05A5A', text: '优先做浴室半分区或阳台家政柜预留位：柜内放盆、侧面开 20cm 圆洞、顶部装排气扇。别挨着洗衣机——震动会让猫拒绝如厕。' },
     aesthetic: { for: '人猫共居美学', color: '#FF9E7D', text: '走嵌入式路线：爬架换墙面木质跳板、猫窝藏进书柜格、猫砂盆进柜体，猫用品全用哑光木色/奶油色，水墨感就保住了。' }
   };
+  /* 居住情况派生建议（依据：猫听觉约为人 6 倍/噪音应激源；Fel d 1 蛋白附着织物，
+     ISFM 环境控制清单：硬质地面、少布艺、HEPA、卧室禁区；独处 8h+ 行为问题率上升） */
+  var LIVE_ADVICE = {
+    alone:  { for: '独居陪伴', color: '#FF9E7D', text: '一个人养猫，上班时间的空白靠环境填：窗边观景位 + 漏食玩具 + 藏食点轮流上岗，回家后固定 15 分钟逗猫棒时间。' },
+    family: { for: '多人家庭', color: '#FF9E7D', text: '猫的听觉约为人的 6 倍，电视声和孩子哭闹都是应激源；在客厅高处留一个「退路位」，并全家统一规则——能不能上床，一个口径。' },
+    share:  { for: '合租改造', color: '#FF9E7D', text: '租房大概率不能打孔：垂直空间用顶天立地猫柱、免钉层板和衣柜顶动线替代墙面跳板，搬家可带走；动工前先拿到室友同意。' }
+  };
+  var KIDS_ADVICE = { for: '儿童与猫共处', color: '#E05A5A', text: '婴儿房设为猫禁区，婴儿床装防护网；教孩子摸背不拽尾、猫吃饭睡觉时不打扰；猫砂盆放在孩子够不到的分区，铲屎后洗手——弓形虫和猫抓病都防在这一步。' };
+  var ALLERGY_ADVICE = { for: '防过敏选材', color: '#7BA87B', text: '致敏的是 Fel d 1 蛋白不是猫毛：地面选木地板/瓷砖慎用地毯，沙发选易清洁的猫抓布，少用厚布艺窗帘，预留空气净化器电位，过敏者卧室设猫禁区。' };
   var FALLBACK = [
     { for: '动线安全', color: '#7BA87B', text: '提前规划猫高速路：从窗户到制高点的路线避开过道正上方，人走人的路，猫飞猫的桥，互不打扰。' },
     { for: '水电收纳', color: '#7BA87B', text: '裸露电线全部入槽或缠麻绳防啃，插座选带防溅盖的款式——好奇猫的舌头比你想的离插座更近。' },
@@ -170,9 +137,13 @@
       var a = ADVICE[state.habits[i]];
       if (a) { list.push(a); }
     }
+    if (state.kids === 'yes') { list.push(KIDS_ADVICE); }
+    if (state.allergy === 'yes') { list.push(ALLERGY_ADVICE); }
+    var la = state.living && LIVE_ADVICE[state.living];
+    if (la) { list.push(la); }
     var fi = 0;
     while (list.length < 3 && fi < FALLBACK.length) { list.push(FALLBACK[fi]); fi++; }
-    return list.slice(0, 3);
+    return list.slice(0, 5);
   }
 
   /* ================= 结果渲染 ================= */
@@ -180,11 +151,6 @@
     if (state.habits.length === 0) { formTip.textContent = '至少选一个猫咪习性哦 🐾'; return; }
     if (!state.pain) { formTip.textContent = '选一个当前最头疼的事吧 😿'; return; }
     formTip.textContent = '';
-    state.score = calculateScore();
-    var mood = moodOf(state.score);
-    $('moodText').textContent = mood.text;
-    $('scoreComment').textContent = mood.comment;
-    $('catMoodBox').innerHTML = catFaceSVG(state.score);
 
     lastAdvice = buildAdvice();
     var box = $('adviceList');
@@ -208,24 +174,6 @@
     }
     box.innerHTML = html;
     goPage('page-result');
-  }
-
-  function animateScore() {
-    var ring = $('ringFg');
-    var num = $('scoreNum');
-    var C = 301.6;
-    ring.style.strokeDashoffset = C;
-    ring.style.stroke = state.score >= 60 ? '#7BA87B' : (state.score >= 40 ? '#FF9E7D' : '#E05A5A');
-    setTimeout(function () {
-      ring.style.strokeDashoffset = C * (1 - state.score / 100);
-    }, 60);
-    if (num._timer) { clearInterval(num._timer); }
-    var cur = 0;
-    num._timer = setInterval(function () {
-      cur += Math.max(1, Math.ceil(state.score / 30));
-      if (cur >= state.score) { cur = state.score; clearInterval(num._timer); num._timer = null; }
-      num.textContent = cur;
-    }, 30);
   }
 
   /* ================= 避坑指南弹窗 ================= */
@@ -299,31 +247,22 @@
     ctx.fillText('狸奴安居', W / 2, 110);
     ctx.fillStyle = 'rgba(43,43,43,.55)';
     ctx.font = '24px sans-serif';
-    ctx.fillText('适猫化装修安全鉴定报告', W / 2, 158);
+    ctx.fillText('适猫化装修建议', W / 2, 158);
 
-    ctx.fillStyle = '#FF9E7D';
-    ctx.font = 'bold 150px "PingFang SC","Microsoft YaHei",sans-serif';
-    ctx.fillText(String(state.score), W / 2, 370);
-    ctx.fillStyle = '#2B2B2B';
-    ctx.font = '26px sans-serif';
-    ctx.fillText('猫咪安心指数', W / 2, 420);
-    ctx.font = 'bold 34px "Kaiti SC","STKaiti",KaiTi,serif';
-    ctx.fillText(moodOf(state.score).text, W / 2, 480);
-
-    drawCat(ctx, W / 2, 620, 85);
+    drawCat(ctx, W / 2, 420, 115);
 
     ctx.fillStyle = 'rgba(43,43,43,.75)';
     ctx.font = '28px "Kaiti SC","STKaiti",KaiTi,serif';
-    ctx.fillText('「溪柴火软蛮毡暖，我与狸奴不出门」', W / 2, 770);
+    ctx.fillText('「溪柴火软蛮毡暖，我与狸奴不出门」', W / 2, 640);
     ctx.fillStyle = 'rgba(43,43,43,.45)';
     ctx.font = '20px serif';
-    ctx.fillText('—— 陆游 ·《十一月四日风雨大作》', W / 2, 810);
+    ctx.fillText('—— 陆游 ·《十一月四日风雨大作》', W / 2, 680);
 
     ctx.textAlign = 'left';
     ctx.fillStyle = '#2B2B2B';
     ctx.font = '22px "PingFang SC","Microsoft YaHei",sans-serif';
-    var y = 875;
-    for (var i = 0; i < lastAdvice.length && y < 990; i++) {
+    var y = 750;
+    for (var i = 0; i < lastAdvice.length && y < 985 && i < 3; i++) {
       var lines = wrapText(ctx, '🐾 ' + lastAdvice[i].for + '：' + lastAdvice[i].text, 580);
       for (var j = 0; j < lines.length && j < 2; j++) {
         ctx.fillText(lines[j], 70, y);
@@ -348,7 +287,7 @@
   }
 
   function exportPoster() {
-    if (lastAdvice.length === 0) { toast('先生成一份鉴定报告哦 🐾'); return; }
+    if (lastAdvice.length === 0) { toast('先生成一份建议哦 🐾'); return; }
     var dataUrl = getPosterDataUrl();
     var mt = getMiniTool();
     if (mt) {
@@ -374,11 +313,11 @@
   function publishNote() {
     var mt = getMiniTool();
     if (!mt || typeof mt.postNote !== 'function') { toast('请在小红书客户端内使用'); return; }
-    if (lastAdvice.length === 0) { toast('先生成一份鉴定报告哦 🐾'); return; }
+    if (lastAdvice.length === 0) { toast('先生成一份建议哦 🐾'); return; }
     var dataUrl = getPosterDataUrl();
     mt.postNote({
-      title: '狸奴安居鉴定报告',
-      content: '我家猫咪安心指数 ' + state.score + ' 分（满分 100）！装修前先给主子做个适猫化体检，铲屎官们快来测测你家能打几分。',
+      title: '狸奴安居适猫化建议',
+      content: '用「狸奴安居」给家里生成了一份适猫化装修建议，从封窗到猫砂盆柜体都安排上了，铲屎官们快来抄作业 🐾',
       pageType: 'photo_publish',
       mediaInfo: { image_resources: [{ url: dataUrl }] }
     }).then(function () {

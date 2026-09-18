@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>狸奴安居 · 适猫化装修安全鉴定</title>
+<title>狸奴安居 · 适猫化装修建议</title>
 <meta name="version" content="0.1.0">
 <style>
   /* ===== 基线重置（Chrome 61 兼容） ===== */
@@ -95,7 +95,7 @@
   .select-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
     color: rgba(43,43,43,.4); pointer-events: none; font-size: 13px; }
 
-  /* 习性 Tag：flex-wrap + margin（基线，不用 flex gap） */
+  /* 习性/居住 Tag：flex-wrap + margin（基线，不用 flex gap） */
   .tags { display: flex; flex-wrap: wrap; margin-top: 12px; }
   .tag { border: 1.5px solid rgba(43,43,43,.13); background: rgba(255,255,255,.55);
     border-radius: 999px; padding: 10px 16px; font-size: 15px; font-family: inherit;
@@ -114,19 +114,6 @@
   .form-tip { text-align: center; font-size: 12px; color: #E05A5A; margin-top: 12px; min-height: 16px; }
 
   /* ===== 结果页 ===== */
-  .score-card { display: flex; align-items: center; }
-  .ring-box { position: relative; width: 110px; height: 110px; flex-shrink: 0; margin-right: 20px; }
-  .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .ring-bg { stroke: #E8DFD0; }
-  .ring-fg { stroke: #FF9E7D; transition: stroke-dashoffset 1.2s cubic-bezier(.22,.9,.35,1); }
-  .ring-center { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .score-num { font-size: 30px; font-weight: bold; line-height: 1; }
-  .score-label { font-size: 11px; color: rgba(43,43,43,.45); margin-top: 2px; }
-  .mood-box { width: 92px; height: 70px; }
-  .mood-text { font-size: 13px; font-weight: bold; margin-top: 4px; }
-  .score-comment { font-size: 13px; line-height: 1.6; color: rgba(43,43,43,.65); margin: 12px 0 4px; }
-
   .section-title { font-size: 17px; font-weight: bold; margin: 28px 0 12px; }
   .advice { display: flex; align-items: flex-start; }
   .advice + .advice { margin-top: 12px; }
@@ -205,11 +192,11 @@
     <p class="poem-from kai">—— 陆游 ·《十一月四日风雨大作》</p>
 
     <h1 class="app-name">狸奴安居</h1>
-    <p class="app-sub">AI 适猫化装修安全鉴定器</p>
+    <p class="app-sub">AI 适猫化装修建议小工具</p>
 
     <div class="cta-wrap">
-      <button id="btnStart" class="btn btn-primary">🐾 开始鉴定我的家</button>
-      <p class="cta-note">为装修前的铲屎官 · 60 秒出报告</p>
+      <button id="btnStart" class="btn btn-primary">🐾 获取我家的适猫化建议</button>
+      <p class="cta-note">为装修前后的铲屎官 · 60 秒出建议</p>
     </div>
   </section>
 
@@ -232,6 +219,28 @@
           <option value="duplex">🐱🐱🐱 复式（有楼梯）</option>
         </select>
         <span class="select-arrow">▾</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">🏡 居住情况</p>
+      <p class="card-sub">选填 · 让建议更贴心</p>
+      <p class="field-label" style="margin-top:14px;"><span>👥 跟谁一起住</span></p>
+      <div id="liveTags" class="tags">
+        <button class="tag" data-live="alone">🧍 独居</button>
+        <button class="tag" data-live="double">👥 两人住</button>
+        <button class="tag" data-live="family">👨‍👩‍👧 一家人</button>
+        <button class="tag" data-live="share">🤝 合租</button>
+      </div>
+      <p class="field-label" style="margin-top:4px;"><span>🧒 有 12 岁以下小孩</span></p>
+      <div id="kidsTags" class="tags">
+        <button class="tag" data-kids="yes">有</button>
+        <button class="tag" data-kids="no">没有</button>
+      </div>
+      <p class="field-label" style="margin-top:4px;"><span>🤧 有人对猫毛过敏</span></p>
+      <div id="allergyTags" class="tags">
+        <button class="tag" data-allergy="yes">有</button>
+        <button class="tag" data-allergy="no">没有</button>
       </div>
     </div>
 
@@ -259,45 +268,24 @@
       </div>
     </div>
 
-    <button id="btnSubmit" class="btn btn-primary">🐾 生成鉴定报告</button>
+    <button id="btnSubmit" class="btn btn-primary">🐾 生成适猫化建议</button>
     <p id="formTip" class="form-tip"></p>
   </section>
 
-  <!-- ============ 结果页：安全鉴定报告 ============ -->
+  <!-- ============ 结果页：适猫化装修建议 ============ -->
   <section id="page-result" class="page">
     <div class="nav">
       <button id="btnBackInput" class="back" aria-label="返回">←</button>
-      <h2 class="nav-title kai">安全鉴定报告</h2>
+      <h2 class="nav-title kai">适猫化装修建议</h2>
     </div>
 
-    <div class="card">
-      <div class="score-card">
-        <div class="ring-box">
-          <svg class="ring-svg" viewBox="0 0 110 110">
-            <circle class="ring-bg" cx="55" cy="55" r="48" fill="none" stroke-width="9"/>
-            <circle id="ringFg" class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke-width="9"
-              stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="301.6"/>
-          </svg>
-          <div class="ring-center">
-            <span id="scoreNum" class="score-num">0</span>
-            <span class="score-label">安心指数</span>
-          </div>
-        </div>
-        <div style="min-width:0;">
-          <div id="catMoodBox" class="mood-box breathe-slow"></div>
-          <p id="moodText" class="mood-text">——</p>
-        </div>
-      </div>
-      <p id="scoreComment" class="score-comment"></p>
-    </div>
-
-    <h3 class="section-title kai">📜 核心建议</h3>
+    <h3 class="section-title kai">📜 为你家定制的建议</h3>
     <div id="adviceList"></div>
 
     <div class="result-actions">
       <button id="btnGuide" class="btn btn-dark">🧶 查看完整装修避坑指南</button>
-      <button id="btnSavePoster" class="btn btn-primary">🐾 保存海报到相册</button>
-      <button id="btnPostNote" class="btn btn-ghost" style="display:none;">📤 发布鉴定报告到小红书</button>
+      <button id="btnSavePoster" class="btn btn-primary">🐾 保存建议海报到相册</button>
+      <button id="btnPostNote" class="btn btn-ghost" style="display:none;">📤 发布建议海报到小红书</button>
     </div>
     <p class="foot-note">狸奴安居 · 愿每一只狸奴都安居 🐟</p>
   </section>
@@ -317,8 +305,8 @@
 <div id="posterMask" class="mask">
   <div class="sheet" role="dialog" aria-label="海报预览">
     <div class="sheet-grip"></div>
-    <h3 class="sheet-title kai">🐾 你的专属海报</h3>
-    <img id="posterImg" class="poster-img" alt="鉴定报告海报">
+    <h3 class="sheet-title kai">🐾 你的专属建议海报</h3>
+    <img id="posterImg" class="poster-img" alt="适猫化装修建议海报">
     <p id="posterHint" class="poster-hint">长按图片即可保存</p>
     <button id="btnClosePoster" class="btn btn-dark">关闭</button>
   </div>
