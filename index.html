@@ -123,6 +123,10 @@
 
   /* ===== 结果页 ===== */
   .section-title { font-size: 17px; font-weight: bold; margin: 28px 0 12px; }
+  /* 建议颜色图例 */
+  .legend { display: flex; flex-wrap: wrap; margin: 0 0 14px; }
+  .lg { display: flex; align-items: center; font-size: 12px; color: rgba(43,43,43,.6); margin: 0 16px 6px 0; }
+  .lg i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0; }
   .advice { display: flex; align-items: flex-start; }
   .advice + .advice { margin-top: 12px; }
   .advice-icon { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; margin-right: 12px;
@@ -347,6 +351,11 @@
     </div>
 
     <h3 class="section-title kai">📜 为你家定制的建议</h3>
+    <div class="legend">
+      <span class="lg"><i style="background:#E05A5A"></i>朱砂 = 安全风险 · 优先处理</span>
+      <span class="lg"><i style="background:#FF9E7D"></i>橘粉 = 陪伴照料</span>
+      <span class="lg"><i style="background:#7BA87B"></i>竹青 = 空间优化</span>
+    </div>
     <div id="adviceList"></div>
 
     <div class="result-actions">
