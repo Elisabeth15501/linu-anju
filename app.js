@@ -363,7 +363,28 @@
     return c;
   }
 
-  function getPosterDataUrl() { return drawPoster().toDataURL('image/png'); }
+  /* 标题首字自检：部分 Android WebView 冷启动时系统 CJK glyph 按需加载，
+     fillText 会静默丢首字（「狸奴安居」画出「奴安居」，且余字位置不变偏右）。
+     检查首字「狸」所在区域是否存在墨色像素：无则视为 glyph 未就绪，整幅重画。 */
+  function titleHasFirstGlyph(c) {
+    try {
+      var d = c.getContext('2d').getImageData(248, 28, 70, 80).data;
+      for (var i = 0; i < d.length; i += 4) {
+        if (d[i] < 120 && d[i + 1] < 120) { return true; } /* 墨黑 #2B2B2B */
+      }
+    } catch (e) { return true; } /* getImageData 不可用时不阻塞正常流程 */
+    return false;
+  }
+
+  /* 带自检重试的海报渲染：glyph 未就绪时每 150ms 整幅重画，最多 10 次 */
+  function renderPoster(cb, tries) {
+    var c = drawPoster();
+    if (!titleHasFirstGlyph(c) && tries < 10) {
+      setTimeout(function () { renderPoster(cb, tries + 1); }, 150);
+      return;
+    }
+    cb(c);
+  }
 
   /* JSBridge 判空与调用（严格按 jsbridge-api.md 约定） */
   function getMiniTool() {
@@ -374,8 +395,10 @@
   /* 生成海报 → 统一打开海报页；保存/发布按钮在海报页内按环境显示 */
   function exportPoster() {
     if (lastAdvice.length === 0) { toast('先生成一份建议哦 🐾'); return; }
-    $('posterImg').src = getPosterDataUrl();
-    $('posterMask').classList.add('open');
+    renderPoster(function (c) {
+      $('posterImg').src = c.toDataURL('image/png');
+      $('posterMask').classList.add('open');
+    }, 0);
   }
 
   function saveToAlbum() {
@@ -399,17 +422,18 @@
     var mt = getMiniTool();
     if (!mt || typeof mt.postNote !== 'function') { toast('请在小红书客户端内使用'); return; }
     if (lastAdvice.length === 0) { toast('先生成一份建议哦 🐾'); return; }
-    var dataUrl = getPosterDataUrl();
-    mt.postNote({
-      title: '狸奴安居适猫化建议',
-      content: '用「狸奴安居」给家里生成了一份适猫化装修建议，从封窗到猫砂盆柜体都安排上了，铲屎官们快来抄作业 🐾',
-      pageType: 'photo_publish',
-      mediaInfo: { image_resources: [{ url: dataUrl }] }
-    }).then(function () {
-      toast('已唤起发布页，等你点发布 📤');
-    }).catch(function (err) {
-      toast('发布失败：' + ((err && err.errMsg) || '未知原因'));
-    });
+    renderPoster(function (c) {
+      mt.postNote({
+        title: '狸奴安居适猫化建议',
+        content: '用「狸奴安居」给家里生成了一份适猫化装修建议，从封窗到猫砂盆柜体都安排上了，铲屎官们快来抄作业 🐾',
+        pageType: 'photo_publish',
+        mediaInfo: { image_resources: [{ url: c.toDataURL('image/png') }] }
+      }).then(function () {
+        toast('已唤起发布页，等你点发布 📤');
+      }).catch(function (err) {
+        toast('发布失败：' + ((err && err.errMsg) || '未知原因'));
+      });
+    }, 0);
   }
 
   function closePoster() { $('posterMask').classList.remove('open'); }
@@ -438,4 +462,14 @@
   if (getMiniTool()) {
     document.body.className += ' xhs-app';
   }
+
+  /* 字体预热：用海报同款字体栈提前触发 CJK glyph 加载，
+     降低 Android WebView 冷启动后首次生成海报丢字的概率 */
+  (function warmUpFonts() {
+    var w = document.createElement('canvas').getContext('2d');
+    w.font = 'bold 52px "Kaiti SC","STKaiti",KaiTi,serif';
+    w.fillText('狸奴安居', 10, 60);
+    w.font = '20px "PingFang SC","Microsoft YaHei",sans-serif';
+    w.fillText('适猫化装修建议·必做', 10, 100);
+  })();
 })();
