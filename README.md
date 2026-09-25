@@ -1,6 +1,6 @@
 # 狸奴安居 · 适猫化装修建议小工具 🐾
 
-![version](https://img.shields.io/badge/version-v0.1.0-FF9E7D) ![platform](https://img.shields.io/badge/小红书小工具-规范合规-7BA87B) [![License: MIT](https://img.shields.io/badge/License-MIT-E05A5A.svg)](LICENSE)
+![version](https://img.shields.io/badge/version-v1.0.0-FF9E7D) ![platform](https://img.shields.io/badge/小红书小工具-规范合规-7BA87B) [![License: MIT](https://img.shields.io/badge/License-MIT-E05A5A.svg)](LICENSE)
 
 > 「溪柴火软蛮毡暖，我与狸奴不出门」—— 陆游
 
@@ -41,7 +41,7 @@
 ## 版本历史
 
 - **v0.1.0（2026-09-18）· MVP 首发版** — 三页流程、安心指数打分 + 四档小猫状态、3 条核心建议 + 6 篇避坑指南、Canvas 2D 海报（存相册/发笔记）；通过小工具规范静态合规扫描。📝 [Release Notes](https://github.com/Elisabeth15501/linu-anju/releases/tag/v0.1.0) · 📎 [下载 zip](https://github.com/Elisabeth15501/linu-anju/releases/download/v0.1.0/linu-anju-minitool.zip)
-- **v0.1.0 版本内迭代（2026-09-18 之后，未发版）** — 删除安心指数，北极星转向「画像 → 定制建议」；新增居住情况三问（居住人数 / 12 岁以下儿童 / 猫毛过敏），建议引擎改为四级严重度排序（痛点 → 习性 → 居住派生 → 兜底，最多 5 条），全站文案从「鉴定」改为「建议」。
+- **v1.0.0（2026-09-26）· 首个正式版** — 北极星定为「画像 → 定制建议」：删除安心指数，建议引擎按四级严重度排序（痛点 → 习性 → 居住派生 → 兜底）；输入页含户型 / 居住情况三问 / 猫咪习性 / 痛点 / 现状盘点（封窗必答 + 必做徽章 / 危险绿植 / 爬高空间 / 陪伴时长 / 预算三档）；结果页三色图例；海报固定 3:4（Canvas 2D 全量精简版 + 首字丢字自检重画）；保存到相册 / 发布小红书均在海报页内。📝 [Release Notes](https://github.com/Elisabeth15501/linu-anju/releases/tag/v1.0.0) · 📎 [下载 zip](https://github.com/Elisabeth15501/linu-anju/releases/download/v1.0.0/linu-anju-minitool.zip)
 
 ## 目录
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>狸奴安居 · 适猫化装修建议</title>
-<meta name="version" content="0.1.0">
+<meta name="version" content="1.0.0">
 <style>
   /* ===== 基线重置（Chrome 61 兼容） ===== */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -361,7 +361,6 @@
     <div class="result-actions">
       <button id="btnGuide" class="btn btn-dark">🧶 查看完整装修避坑指南</button>
       <button id="btnSavePoster" class="btn btn-primary">🐾 一键生成建议海报</button>
-      <button id="btnPostNote" class="btn btn-ghost" style="display:none;">📤 发布建议海报到小红书</button>
     </div>
     <p class="foot-note">狸奴安居 · 愿每一只狸奴都安居 🐟</p>
   </section>
@@ -384,6 +383,11 @@
     <h3 class="sheet-title kai">🐾 你的专属建议海报</h3>
     <img id="posterImg" class="poster-img" alt="适猫化装修建议海报">
     <p id="posterHint" class="poster-hint">长按图片即可保存</p>
+    <!-- 小工具容器内（有 SDK）：保存/发布按钮放进海报页 -->
+    <div id="posterSdkActions" style="display:none;">
+      <button id="btnSaveAlbum" class="btn btn-primary">🐾 保存海报到相册</button>
+      <button id="btnPostNote" class="btn btn-ghost">📤 发布建议海报到小红书</button>
+    </div>
     <button id="btnClosePoster" class="btn btn-dark">关闭</button>
   </div>
 </div>
