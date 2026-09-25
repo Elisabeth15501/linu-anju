@@ -1,6 +1,6 @@
 # 狸奴安居 · 适猫化装修建议小工具 🐾
 
-![version](https://img.shields.io/badge/version-v1.0.0-FF9E7D) ![platform](https://img.shields.io/badge/小红书小工具-规范合规-7BA87B) [![License: MIT](https://img.shields.io/badge/License-MIT-E05A5A.svg)](LICENSE)
+![version](https://img.shields.io/badge/version-v1.1.0-FF9E7D) ![platform](https://img.shields.io/badge/小红书小工具-规范合规-7BA87B) [![License: MIT](https://img.shields.io/badge/License-MIT-E05A5A.svg)](LICENSE)
 
 > 「溪柴火软蛮毡暖，我与狸奴不出门」—— 陆游
 
@@ -10,7 +10,7 @@
 
 - **首页**：水墨萌宠风 Landing（CSS/SVG 手绘小猫 + 陆游诗句）
 - **输入页**：实用面积滑块（🐟滑块头）、楼层结构、居住情况三问（居住人数 / 12 岁以下儿童 / 猫毛过敏，选填）、6 种猫咪习性多选、4 类装修痛点单选
-- **结果页**：按画像生成的定制建议卡（痛点优先 + 习性 + 居住情况派生 + 兜底，最多 5 条）、6 篇避坑指南弹窗
+- **结果页**：按画像生成的定制建议卡（痛点优先 + 习性 + 居住情况派生 + 兜底，最多 5 条）、6 篇避坑指南弹窗、**关键词锦囊**（精选搜索词，长按选中复制后去小红书搜真实案例——因容器禁网络请求与跳转 API，为官方推荐的可选文本降级方案）
 - **海报**：Canvas 2D 原生绘制专属建议海报，支持保存到相册 / 发布小红书笔记（容器内）
 
 ## 建议引擎（buildAdvice）
@@ -39,6 +39,8 @@
 - ✅ 资源全部为相对路径 / `data:` URI，无 `<base>`、iframe、自建 CSP
 
 ## 版本历史
+
+- **v1.1.0（2026-09-26）· 关键词锦囊** — 结果页新增精选搜索关键词（金刚网封窗 / 猫砂盆柜体 / 墙面跳板承重 / 顶天立地猫柱 / 免打孔猫家具 / 适猫化装修），可选中文本 + 引导手动搜索（容器禁网络与跳转 API，此为官方推荐的合规降级方案）。📝 [Release Notes](https://github.com/Elisabeth15501/linu-anju/releases/tag/v1.1.0) · 📎 [下载 zip](https://github.com/Elisabeth15501/linu-anju/releases/download/v1.1.0/linu-anju-minitool.zip)
 
 - **v0.1.0（2026-09-18）· MVP 首发版** — 三页流程、安心指数打分 + 四档小猫状态、3 条核心建议 + 6 篇避坑指南、Canvas 2D 海报（存相册/发笔记）；通过小工具规范静态合规扫描。📝 [Release Notes](https://github.com/Elisabeth15501/linu-anju/releases/tag/v0.1.0) · 📎 [下载 zip](https://github.com/Elisabeth15501/linu-anju/releases/download/v0.1.0/linu-anju-minitool.zip)
 - **v1.0.0（2026-09-26）· 首个正式版** — 北极星定为「画像 → 定制建议」：删除安心指数，建议引擎按四级严重度排序（痛点 → 习性 → 居住派生 → 兜底）；输入页含户型 / 居住情况三问 / 猫咪习性 / 痛点 / 现状盘点（封窗必答 + 必做徽章 / 危险绿植 / 爬高空间 / 陪伴时长 / 预算三档）；结果页三色图例；海报固定 3:4（Canvas 2D 全量精简版 + 首字丢字自检重画）；保存到相册 / 发布小红书均在海报页内。📝 [Release Notes](https://github.com/Elisabeth15501/linu-anju/releases/tag/v1.0.0) · 📎 [下载 zip](https://github.com/Elisabeth15501/linu-anju/releases/download/v1.0.0/linu-anju-minitool.zip)
